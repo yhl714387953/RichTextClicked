@@ -99,6 +99,11 @@
         return;
     }
     
+    if (!_currentInfo) {
+        
+        return;
+    }
+    
     if (_currentInfo && [info[@"id"] isEqualToString:_currentInfo[@"id"]]) {
         [self highlightedBack];
     }else{
@@ -110,6 +115,11 @@
     
     NSDictionary* info = [self getClickInfoTouches:touches];
     if (!info) {
+        return;
+    }
+    
+    if (!_currentInfo) {
+        
         return;
     }
     

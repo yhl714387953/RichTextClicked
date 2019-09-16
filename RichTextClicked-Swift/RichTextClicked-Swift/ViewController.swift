@@ -75,6 +75,7 @@ class ViewController: UIViewController {
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
         let info = getClickInfoTouches(touches: touches)
         
         if info == nil{
@@ -102,6 +103,10 @@ class ViewController: UIViewController {
         
         if info == nil{
 
+            return
+        }
+        
+        if _currentInfo == nil {
             return
         }
         
