@@ -63,8 +63,11 @@
         
         NSDictionary* dic1 = @{ @"id": @"protocol", @"text": h1 };
         NSDictionary* dic2 = @{ @"id": @"strategy", @"text": h2 };
-        [_attStr addAttribute:NSLinkAttributeName value:dic1 range:[str rangeOfString:h1]];
-        [_attStr addAttribute:NSLinkAttributeName value:dic2 range:[str rangeOfString:h2]];
+        NSDictionary* attributs1 = @{@"moreInfo": dic1, NSUnderlineStyleAttributeName: @(1), NSUnderlineColorAttributeName:[UIColor blueColor], NSForegroundColorAttributeName: [UIColor blueColor]};
+        NSDictionary* attributs2 = @{@"moreInfo": dic2, NSUnderlineStyleAttributeName: @(1), NSUnderlineColorAttributeName:[UIColor blueColor], NSForegroundColorAttributeName: [UIColor blueColor]};
+        [_attStr addAttributes:attributs1 range:[str rangeOfString:h1]];
+        [_attStr addAttributes:attributs2 range:[str rangeOfString:h2]];
+
     }
     
     return _attStr;
@@ -126,10 +129,11 @@
     if ([info[@"id"] isEqualToString:_currentInfo[@"id"]]) {
         
         [self showViewController];
+        [self hasClickedAtt];
     }
     
     _currentInfo = nil;
-    [self removeAtt];
+//    [self removeAtt];
 }
 
 -(void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
@@ -161,16 +165,16 @@
     
     NSDictionary* info = [self.attStr attributesAtIndex:index effectiveRange:&range];
     
-    if (![info[@"NSLink"] isKindOfClass:[NSDictionary class]]) {
+    if (![info[@"moreInfo"] isKindOfClass:[NSDictionary class]]) {
         return nil;
     }
     
-    NSString* text = info[@"NSLink"][@"text"];
+    NSString* text = info[@"moreInfo"][@"text"];
     NSRange textRange = [self.attStr.string rangeOfString:text];
     
     if (index > textRange.location && index < textRange.location + textRange.length) {
         
-        return info[@"NSLink"];
+        return info[@"moreInfo"];
     }
     return nil;
 }
@@ -187,6 +191,19 @@
    
     NSRange range = NSMakeRange(0, self.attStr.length);
     [self.attStr removeAttribute:NSBackgroundColorAttributeName range:range];
+    self.label.attributedText = self.attStr;
+}
+
+-(void)hasClickedAtt{
+    
+    NSString* text = _currentInfo[@"text"];
+    NSRange textRange = [self.attStr.string rangeOfString:text];
+    [self.attStr removeAttribute:NSForegroundColorAttributeName range:textRange];
+    [self.attStr removeAttribute:NSUnderlineColorAttributeName range:textRange];
+    [self.attStr removeAttribute:NSBackgroundColorAttributeName range:textRange];
+    [self.attStr addAttribute:NSForegroundColorAttributeName value:[UIColor purpleColor] range:textRange];
+    [self.attStr addAttribute:NSUnderlineColorAttributeName value:[UIColor purpleColor] range:textRange];
+    
     self.label.attributedText = self.attStr;
 }
 

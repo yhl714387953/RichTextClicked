@@ -37,9 +37,11 @@ class ViewController: UIViewController {
         let dic1 = ["id": "protocol", "text": h1]
         let dic2 = ["id": "strategy", "text": h2]
         
-        
-        myAttStr.addAttribute(.link, value: dic1, range: NSString(string: str).range(of: h1))
-        myAttStr.addAttribute(.link, value: dic2, range: NSString(string: str).range(of: h2))
+        let attributs1 = [NSAttributedString.Key(rawValue: "moreInfo"): dic1, NSAttributedString.Key.underlineStyle: 1, NSAttributedString.Key.underlineColor:UIColor.blue, NSAttributedString.Key.foregroundColor: UIColor.blue] as [NSAttributedString.Key : Any]
+        let attributs2 = [NSAttributedString.Key(rawValue: "moreInfo"): dic2, NSAttributedString.Key.underlineStyle: 1, NSAttributedString.Key.underlineColor:UIColor.blue, NSAttributedString.Key.foregroundColor: UIColor.blue] as [NSAttributedString.Key : Any]
+
+        myAttStr.addAttributes(attributs1, range: NSString(string: str).range(of: h1))
+        myAttStr.addAttributes(attributs2, range: NSString(string: str).range(of: h2))
         
         return myAttStr
     }()
@@ -114,10 +116,11 @@ class ViewController: UIViewController {
         let id = info!["id"] as! String
         if _currentInfo != nil && id == cur_id{
             showViewController()
+            hasClickedAtt()
         }
         
         _currentInfo = nil
-        removeAtt()
+//        removeAtt()
 
     }
     
@@ -131,7 +134,7 @@ class ViewController: UIViewController {
         
         if let info = _currentInfo {
             let text = info["text"] as! String
-            let textRange = NSString(string: attStr.string).range(of: text);
+            let textRange = NSString(string: attStr.string).range(of: text)
             let color = UIColor.lightGray.withAlphaComponent(0.5)
             attStr.addAttribute(.backgroundColor, value: color, range: textRange)
             attLabel.attributedText = attStr
@@ -141,6 +144,17 @@ class ViewController: UIViewController {
     func removeAtt() {
         let range = NSMakeRange(0, attStr.length)
         attStr.removeAttribute(.backgroundColor, range: range)
+        attLabel.attributedText = attStr
+    }
+    
+    func hasClickedAtt(){
+        let text = _currentInfo!["text"] as! String
+        let textRange = NSString(string: attStr.string).range(of: text)
+        attStr.removeAttribute(.foregroundColor, range: textRange)
+        attStr.removeAttribute(.underlineColor, range: textRange)
+        attStr.removeAttribute(.backgroundColor, range: textRange)
+        attStr.addAttribute(.foregroundColor, value: UIColor.purple, range: textRange)
+        attStr.addAttribute(.underlineColor, value: UIColor.purple, range: textRange)
         attLabel.attributedText = attStr
     }
     
@@ -176,7 +190,8 @@ class ViewController: UIViewController {
             return nil
         }
       
-        let linkInfo = info[.link]
+//        let linkInfo = info[.link]
+        let linkInfo = info[NSAttributedString.Key("moreInfo")]
         if !(linkInfo is Dictionary<String, Any>) {
             return nil
         }
@@ -210,10 +225,6 @@ class ViewController: UIViewController {
         let frame = CTFramesetterCreateFrame(frameSetter, CFRangeMake(0, attributedStr.length), path, nil);
         let lines = CTFrameGetLines(frame);
         let numberOfLines = CFArrayGetCount(lines);
-        
-//        let lineHeight = label.frame.height / CGFloat(numberOfLines)
-//        let lineIndex = Int(aPoint.y / lineHeight)
-//        let clickLine = CFArrayGetValueAtIndex(lines, lineIndex)
         
 //        注意数组的初始化方式
         var lineOrigins = [CGPoint](repeating: .zero, count: numberOfLines)
@@ -249,130 +260,3 @@ class ViewController: UIViewController {
     }
     
 }
-    
-    /*
-    #pragma mark - touch action
-    -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    
-    _currentInfo = [self getClickInfoTouches:touches];
-    if (_currentInfo) {
-    
-    [self highlightedBack];
-    }
-    }
-    
-    -(void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    
-    NSDictionary* info = [self getClickInfoTouches:touches];
-    if (!info) {
-    [self removeAtt];
-    
-    return;
-    }
-    
-    if (_currentInfo && [info[@"id"] isEqualToString:_currentInfo[@"id"]]) {
-    [self highlightedBack];
-    }else{
-    [self removeAtt];
-    }
-    }
-    
-    -(void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    
-    NSDictionary* info = [self getClickInfoTouches:touches];
-    if (!info) {
-    return;
-    }
-    
-    if ([info[@"id"] isEqualToString:_currentInfo[@"id"]]) {
-    
-    [self showViewController];
-    }
-    
-    _currentInfo = nil;
-    [self removeAtt];
-    }
-    
-    -(void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    [self removeAtt];
-    }
-    */
-    
-
-
-
-/*
-    -(void)highlightedBack{
-    NSString* text = _currentInfo[@"text"];
-    NSRange textRange = [self.attStr.string rangeOfString:text];
-    UIColor* color = [[UIColor lightGrayColor] colorWithAlphaComponent:0.5];
-    [self.attStr addAttribute:NSBackgroundColorAttributeName value:color range:textRange];
-    self.label.attributedText = self.attStr;
-    }
-    
-    -(void)removeAtt{
-    
-    NSRange range = NSMakeRange(0, self.attStr.length);
-    [self.attStr removeAttribute:NSBackgroundColorAttributeName range:range];
-    self.label.attributedText = self.attStr;
-    }
-*/
-
-/*
-    -(void)showViewController{
-    
-    NSString* text = _currentInfo[@"text"];
-    UIViewController* vc = [[UIViewController alloc] init];
-    vc.view.backgroundColor = [UIColor whiteColor];
-    vc.title = text;
-    [self.navigationController pushViewController:vc animated:YES];
-    }
-*/
-
-/*
-    -(CFIndex)getIndexOfStringInLabel:(UILabel *)label point:(CGPoint)point {
-    
-    CGRect rect = label.bounds;
-    point = CGPointMake(point.x, rect.size.height - point.y);
-    
-    NSUInteger index = NSNotFound;
-    
-    NSAttributedString *attStr = label.attributedText;
-    CTFramesetterRef frameSetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)attStr);
-    
-    CGMutablePathRef path = CGPathCreateMutable();
-    
-    CGPathAddRect(path, NULL, rect);
-    CTFrameRef frame = CTFramesetterCreateFrame(frameSetter, CFRangeMake(0, 0), path, NULL);
-    CFArrayRef lines = CTFrameGetLines(frame);
-    NSInteger numberOfLines = CFArrayGetCount(lines);
-    
-    CGPoint lineOrigins[numberOfLines];
-    CTFrameGetLineOrigins(frame, CFRangeMake(0, numberOfLines), lineOrigins);
-    for (CFIndex lineIndex = 0; lineIndex < numberOfLines; lineIndex++) {
-    
-    CGPoint lineOrigin = lineOrigins[lineIndex];
-    CTLineRef line = CFArrayGetValueAtIndex(lines, lineIndex);
-    CGFloat ascent, descent, leading, width;
-    width = CTLineGetTypographicBounds(line, &ascent, &descent, &leading);
-    CGFloat yMin = floor(lineOrigin.y - descent);
-    CGFloat yMax = ceil(lineOrigin.y + ascent);
-    if (point.y > yMax) {
-    
-    break;
-    }
-    
-    if (point.y >= yMin) {
-    if (point.x >= lineOrigin.x && point.x <= lineOrigin.x + width) {
-    CGPoint relativePoint = CGPointMake(point.x - lineOrigin.x, point.y - lineOrigin.y);
-    index = CTLineGetStringIndexForPosition(line, relativePoint);
-    break;
-    }
-    }
-    }
-    
-    return index;
-    }
-*/
-
-
