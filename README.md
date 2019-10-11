@@ -12,7 +12,7 @@
 
 ```
 
-其中 `NSAttributedStringKey` 可以自定义，这样可以使富文本中包含更多信息，比如通过懒加载的方式初始化一个字符串 `attStr`
+其中 `NSAttributedStringKey` 可以自定义，这样可以使富文本中包含更多信息，比如通过懒加载的方式初始化一个富文本 `attStr`
 
 **OC**
 
